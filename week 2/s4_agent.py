@@ -1,16 +1,30 @@
-import sys
-sys.path.insert(0, r'C:\Users\PC-2B-14\Downloads\agentic ai\week 1')
 
-from agents import Agent, Runner
+from agents import Agent, function_tool
 from llm import model
+from web_search import web_search
 
-INSTRUCTIONS = 'You are a helpful code assistant. Write clean, simple Python code. Explain briefly.'
+@function_tool
+def get_weather(city: str) -> str:
+    """Get weather information for a city."""
+    return f"The weather in {city} is sunny with 30 degree temperature."
 
-agent = Agent(name='CodeAssistant', instructions=INSTRUCTIONS, model=model)
+INSTRUCTIONS = """
+You are a helpful AI assistant.
 
-while True:
-    user_input = input('You: ')
-    if user_input.lower() == 'quit':
-        break
-    result = Runner.run_sync(agent, user_input)
-    print(f'Agent: {result.final_output}')
+You have access to two tools:
+
+1. get_weather:
+   Use this tool when the user asks about weather.
+
+2. web_search:
+   Use this tool for current information or topics that require internet research.
+
+Explain answers briefly and clearly, and cite URLs when using web search results.
+"""
+
+agent = Agent(
+    name="WebSearchAgent",
+    instructions=INSTRUCTIONS,
+    model=model,
+    tools=[get_weather, web_search]
+)
